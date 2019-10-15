@@ -1,8 +1,8 @@
 const Koa = require('koa')
-const config = require('./config/default')
-const mysql = require('./mysql')
 const config = require('./src/config/default')
+const bodyParser = require('koa-bodyparser')
 const router = require('./src/router') //导入router
+const cors = require('./src/utils/cors')
 
 const app = new Koa()
 
