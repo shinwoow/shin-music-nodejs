@@ -10,7 +10,9 @@ const config = {
     PASSWORD: 'tiger',
     PORT: '3306',
     HOST: 'localhost'
-  }
+  },
+
+  musicPath: "C:\\Users\\shin\\Music"   //音乐文件存放路径
 }
 
 module.exports = config
