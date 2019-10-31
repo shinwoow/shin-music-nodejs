@@ -10,7 +10,9 @@
 
 
 ### 运行项目
-<code>
-  cd node-shin-music
-  npm start
-</code>
+```
+cd node-shin-music
+npm start
+```
+  
+
