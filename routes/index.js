@@ -43,8 +43,8 @@ router.get('/music', async (ctx, next) => {
 router.post('/uploadFilds', async (ctx, next) => {
 
   const files = ctx.request.files.file;
-  let count = 0;
-  files.forEach(file => {
+
+  let uploading = function (file) {
     // 创建可读流
     const reader = fs.createReadStream(file.path);
 
@@ -53,9 +53,18 @@ router.post('/uploadFilds', async (ctx, next) => {
     const upStream = fs.createWriteStream(targetPath);
     // 可读流通过管道写入可写流
     reader.pipe(upStream);
-    count++;
+  }
+  let count = 0;
+  if (files.length) {
+    files.forEach(file => {
+      uploading(file);
+      count++;
+    });
+  } else {
+    uploading(files);
+    count = 1;
+  }
 
-  });
   //返回上传结果
   return ctx.body = {
     code: 200,
