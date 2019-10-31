@@ -1,33 +1,58 @@
 const Koa = require('koa')
-const config = require('./src/config/default')
-const bodyParser = require('koa-bodyparser')
-const router = require('./src/router') //导入router
-const cors = require('./src/utils/cors')
-
 const app = new Koa()
+const views = require('koa-views')
+const json = require('koa-json')
+const onerror = require('koa-onerror')
+const bodyparser = require('koa-bodyparser')
+const logger = require('koa-logger')
+const koaBody = require('koa-body') //解析文件上传
 
-//解析request的body
-app.use(bodyParser())
+const cors = require('./utils/cors')
 
-//打印当前访问路由
-app.use(async (ctx, next) => {
-  console.log(`Process ${ctx.request.method} ${ctx.request.url}...`);
-  await next();
-});
+const router = require('./routes/index')
+// const users = require('./routes/users')
 
-console.log((new Date()).toString().split(' ').slice(0, 4).join(' '))
+// error handler
+onerror(app)
 
-//启用router中间件
-app.use(router.routes())
+// middlewares
+app.use(bodyparser({
+  enableTypes: ['json', 'form', 'text']
+}))
+app.use(json())
+app.use(logger())
+app.use(require('koa-static')(__dirname + '/public'))
+
+app.use(views(__dirname + '/views', {
+  extension: 'pug'
+}))
 
 //跨域设置cors
 app.use(cors)
 
-//添加错误事件侦听器
-// app.on('error', (err, ctx) => {
-//   log.error('server error', err, ctx)
-// });
+//挂载文件解析中间件
+app.use(koaBody({
+  multipart: true, //支持表单上传
+  formidable: {
+    maxFileSize: 20 * 1024 * 1024 //限制文件大小，默认2M
+  }
+}))
 
-app.listen(config.port)
+// logger
+app.use(async (ctx, next) => {
+  const start = new Date()
+  await next()
+  const ms = new Date() - start
+  console.log(`${ctx.method} ${ctx.url} - ${ms}ms`)
+})
 
-console.log(`listening on port ${config.port}: http://127.0.0.1:3000`)
+// routes
+app.use(router.routes(), router.allowedMethods())
+// app.use(users.routes(), users.allowedMethods())
+
+// error-handling
+app.on('error', (err, ctx) => {
+  console.error('server error', err, ctx)
+});
+
+module.exports = app
