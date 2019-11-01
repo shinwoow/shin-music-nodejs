@@ -1,6 +1,9 @@
 const router = require('koa-router')()
 
-router.prefix('/users')
+//实例化路由， 拼接到api路径下，restful规范
+const router = new Router({
+  prefix: '/api/user'
+});
 
 router.get('/', function (ctx, next) {
   ctx.body = 'this is a users response!'

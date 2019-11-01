@@ -10,7 +10,8 @@ const koaBody = require('koa-body') //解析文件上传
 const cors = require('./utils/cors')
 
 const router = require('./routes/index')
-// const users = require('./routes/users')
+const music = require('./routes/music')
+const user = require('./routes/user')
 
 // error handler
 onerror(app)
@@ -50,7 +51,8 @@ app.use(async (ctx, next) => {
 
 // routes
 app.use(router.routes(), router.allowedMethods())
-// app.use(users.routes(), users.allowedMethods())
+app.use(music.routes(), music.allowedMethods())
+app.use(user.routes(), user.allowedMethods())
 
 // error-handling
 app.on('error', (err, ctx) => {
