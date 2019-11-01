@@ -1,4 +1,4 @@
-const router = require('koa-router')()
+const Router = require('koa-router')
 
 //实例化路由， 拼接到api路径下，restful规范
 const router = new Router({

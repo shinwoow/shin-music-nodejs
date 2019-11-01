@@ -2,6 +2,7 @@ const mysql = require('../mysql')
 const Router = require('koa-router')
 const fs = require('fs')
 const path = require('path')
+const config = require('../config/default.js')
 
 //实例化路由， 拼接到api路径下，restful规范
 const router = new Router({
@@ -20,7 +21,6 @@ router.get('/getMusicList', async (ctx, next) => {
   next()
 })
 
-
 // 定义文件上传路由
 router.post('/uploadFilds', async (ctx, next) => {
 
@@ -35,6 +35,13 @@ router.post('/uploadFilds', async (ctx, next) => {
     const upStream = fs.createWriteStream(targetPath);
     // 可读流通过管道写入可写流
     reader.pipe(upStream);
+
+    let values = {
+      'name': file.name.split('.')[0],
+      'path': config.musicPath + `/${file.name.split('.')[1]}/` + file.name
+    }
+    console.log(values)
+    mysql.insertMusic(values)
   }
   let count = 0;
   if (files.length) {
@@ -46,6 +53,8 @@ router.post('/uploadFilds', async (ctx, next) => {
     uploading(files);
     count = 1;
   }
+
+
 
   //返回上传结果
   return ctx.body = {

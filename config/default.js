@@ -12,7 +12,8 @@ const config = {
     HOST: 'localhost'
   },
 
-  musicPath: "C:\\Users\\shin\\Music"   //音乐文件存放路径
+  musicPath: "127.0.0.1:3000",   //音乐文件存放路径
+  // musicPath: ""
 }
 
 module.exports = config
