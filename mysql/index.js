@@ -54,6 +54,28 @@ function insert(tableName, params, values) {
   })
 }
 
+/**
+ * 主键重新排序
+ * @param {String} tableName 表名
+ */
+function idResort(tableName) {
+  //删除主键
+  pool.query(`ALTER TABLE ${tableName} DROP ID`);
+  //新增ID列，并重新赋值
+  pool.query(`AlTER TABLE  ${tableName} ADD ID INT NOT NULL PRIMARY KEY AUTO_INCREMENT FIRST`);
+
+}
+
+/**
+ * 当表不存在则新建表
+ * @param {String} tableName 新建表名
+ * @param {String} likeTable 模板表名
+ */
+function createTable(tableName, likeTable) {
+  let create = `CREATE TABLE IF NOT EXISTS ${tableName} LIKE ${likeTable}`;
+  pool.query(create);
+}
+
 class Mysql {
   constructor() {
 
@@ -73,13 +95,33 @@ class Mysql {
 
     })
   }
-  //将上传的文件信息保存到mysql
+
+  /**
+   * 将music上传的文件信息保存到mysql
+   * @param {Object} values 保存到mysql的数据
+   */
   insertMusic(values) {
     let date = new Date();
     let Y = date.getFullYear() + '-';
     let M = (date.getMonth() + 1 < 10 ? '0' + (date.getMonth() + 1) : date.getMonth() + 1) + '-';
     let D = date.getDate();
-    return insert('music', ['music_name', 'music_path', 'create_date'], [values.name, values.path, Y + M + D])
+
+    idResort('music');
+    return insert('music', ['music_name', 'music_path', 'type', 'create_date'], [values.name, values.path, values.type, Y + M + D]);
+  }
+
+  /**
+   * 保存其他文件上传信息
+   * @param {Object} values 存入mysql
+   */
+  async insertFile(values) {
+    let date = new Date();
+    let Y = date.getFullYear() + '-';
+    let M = (date.getMonth() + 1 < 10 ? '0' + (date.getMonth() + 1) : date.getMonth() + 1) + '-';
+    let D = date.getDate();
+
+    await createTable(values.type, 'file_module');
+    return insert(`${values.type}`, ['name', 'path', 'type', 'create_date'], [values.name, values.path, values.type, Y + M + D]);
   }
 }
 
