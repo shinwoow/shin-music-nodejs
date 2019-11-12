@@ -13,6 +13,8 @@ const router = require('./routes/index')
 const music = require('./routes/music')
 const user = require('./routes/user')
 
+const log = require('./log/index')
+
 // error handler
 onerror(app)
 
@@ -21,7 +23,15 @@ app.use(bodyparser({
   enableTypes: ['json', 'form', 'text']
 }))
 app.use(json())
-app.use(logger())
+app.use(logger({
+    transporter: (str, args) => {
+      console.log('logger')
+      console.log(str)
+      console.log(args)
+    }
+  }
+
+))
 app.use(require('koa-static')(__dirname + '/public'))
 app.use(require('koa-static')(__dirname + '/uploads'))
 
@@ -44,6 +54,7 @@ app.use(koaBody({
 // logger
 app.use(async (ctx, next) => {
   const start = new Date()
+  console.log(ctx)
   await next()
   const ms = new Date() - start
   console.log(`${ctx.method} ${ctx.url} - ${ms}ms`)
