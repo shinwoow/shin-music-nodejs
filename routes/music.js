@@ -4,6 +4,14 @@ const fs = require('fs')
 const path = require('path')
 const config = require('../config/default.js')
 
+if (process.env.NODE_ENV == 'development') {
+  baseUrl = config.musicPathDev
+} else if (process.env.NODE_ENV == 'production') {
+  baseUrl = config.musicPathPro
+} else {
+  baseUrl = config.musicPathDev
+}
+
 //实例化路由， 拼接到api路径下，restful规范
 const router = new Router({
   prefix: '/api/music'
@@ -35,13 +43,22 @@ router.post('/uploadFilds', async (ctx, next) => {
     const upStream = fs.createWriteStream(targetPath);
     // 可读流通过管道写入可写流
     reader.pipe(upStream);
-
+    let msg = file.name.split('.');
+    let musicType = ['mp3', 'wav', 'wma', 'rm', 'midi', 'ape', 'flac'];
     let values = {
-      'name': file.name.split('.')[0],
-      'path': config.musicPath + `/${file.name.split('.')[1]}/` + file.name
+      'type': msg.pop(),
+      'name': msg.join(''),
+      'path': baseUrl + `/${file.name.split('.')[1]}/` + file.name
     }
+    console.log('------------------------------------------------------------')
     console.log(values)
-    mysql.insertMusic(values)
+    console.log('------------------------------------------------------------')
+    if (musicType.includes(values.type)) {
+      mysql.insertMusic(values)
+    } else {
+      mysql.insertFile(values)
+    }
+
   }
   let count = 0;
   if (files.length) {

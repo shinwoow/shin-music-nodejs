@@ -12,8 +12,9 @@ const config = {
     HOST: 'localhost'
   },
 
-  musicPath: "http://127.0.0.1:3000",   //音乐文件存放路径
-  // musicPath: "http://i07.xyz"
+
+  musicPathDev: "http://127.0.0.1:3000", //音乐文件存放路径
+  musicPathPro: "http://music.i07.xyz"
 }
 
 module.exports = config
